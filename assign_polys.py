@@ -141,5 +141,21 @@ if __name__ == '__main__':
         print("Exiting...")
         exit(1)
 
-    # -----
+    # ----- Write result to CSV -----
+
+    # Convert joined geodataframe to pandas dataframe
+    df_joined = pd.DataFrame(gdf_joined.drop(columns="geometry"))
+
+    # Append "SpatialJoin" to the data file name
+    fname = data_path.name.split(".")[0]+"SpatialJoin.csv"
+
+    # Write csv
+    print("Writing CSV...")
+    try:
+        df_joined.to_csv(fname)
+        print("Success.")
+    except:
+        print("Could not write result.")
+        print("Exiting...")
+        exit(1)
 
