@@ -76,9 +76,13 @@ echo poly_path="C:\path\to\polygons.shp" > config.py
 ```
 This should produce a file called `config.py` in the directory. To change the default path, delete this file and rerun the above line, or edit the variable inside the file.
 
-### If you get Errors
+### If You Get Errors
 
-If the utility fails for any reason, you will either see a message print the screen followed by `Exiting...`. If this happens, information about the error will be written to a file called  `assign_polys.log`. You can open up that file and try to determine what went wrong yourself, or if you can't figure it out you can create a new github issue with the contents of the logfile copy/pasted in, along with any other information you think might be useful to debug the issue and I will take a look.
+If the utility fails for any reason, you will either see a message print the screen followed by `Exiting...`. 
+
+If this happens, information about the error will be written to a file called  `assign_polys.log`. 
+
+You can open up that file and try to determine what went wrong yourself, or if you can't figure it out you can create a new github issue with the contents of the logfile copy/pasted in, along with any other information you think might be useful to debug the issue and I will take a look.
 
 Note that the logfile is generated everytime the utility is run, but will be empty if the run was successful. Also note that the logfile is deleted and rewritten on every run.
 
