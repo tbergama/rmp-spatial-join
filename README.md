@@ -47,7 +47,7 @@ optional arguments:
 
 ### Example Run
 
-This is an example of a successful run of the utility. In this case, the data file is located at `C:\path\to\data.csv`, the polygon shapefile is located at `C:\path\to\polygons.shp`, the latitude and longitude column names in the data file are `Latitude` and `Longitude` respectively, and the data file uses `<Null>` to indicate null values.
+This is an example of a successful run of the utility:
 
 ```
 (rmp-spatial-join) rmp-spatial-join>python assign_polys.py -d "C:\path\to\data.csv" -p "C:\path\to\polygons.shp" --lat Latitude --lon Longitude --nullvals "<Null>"
@@ -62,6 +62,8 @@ Success.
 Writing CSV...
 Success.
 ```
+
+In this case, the data file is located at `C:\path\to\data.csv`, the polygon shapefile is located at `C:\path\to\polygons.shp`, the latitude and longitude column names in the data file are `Latitude` and `Longitude` respectively, and the data file uses `<Null>` to indicate null values.
 
 After the utility is run, you will find `dataSpatialJoin.csv` in the `rmp-spatial-join` directory. This file will contain everything that the original data file did, but a new colomn will be present with the IDs of the polygons they were assigned to.
 
