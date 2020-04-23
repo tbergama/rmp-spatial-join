@@ -29,13 +29,13 @@ if __name__ == '__main__':
     parser.add_argument(
         "-d", "--data",
         required=True,
-        help="File path to data .csv (use \"/\" not \"\\\")"
+        help="File path to data .csv"
     )
 
     parser.add_argument(
         "-p", "--polygons",
         default=None,
-        help="File path to polygon .shp (use \"/\" not \"\\\")"
+        help="File path to polygon .shp"
     )
 
     parser.add_argument(
