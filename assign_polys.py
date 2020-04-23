@@ -2,11 +2,25 @@
 
 import argparse
 from pathlib import Path
+import os
 import pandas as pd
 import geopandas as gpd
 import warnings
+import logging
 
 if __name__ == '__main__':
+
+    # ----- Set Up Logging ------
+
+    logfile = "assign_polys.log"
+
+    # Delete any old logfile
+    if os.path.exists(logfile):
+        os.remove(logfile)
+
+    # Initialize logfile
+    FORMAT = "%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s"
+    logging.basicConfig(filename=logfile, format=FORMAT)
 
     # ----- Parse Arguments -----
 
@@ -56,6 +70,7 @@ if __name__ == '__main__':
             from config import poly_path
             poly_path = Path(poly_path)
         except:
+            logging.exception("Polygon path was not provided and no default was found.")
             print("Polygon path was not provided and no default was found.")
             print("Provide a polygon path with -p/--polygons or set default path by running: " \
                   "echo poly_path=\"path/to/polys.shp\" > config.py")
@@ -89,6 +104,7 @@ if __name__ == '__main__':
         df_data = pd.read_csv(data_path, na_values=null_vals)
         print("Success.")
     except:
+        logging.exception("Error reading data file.")
         print("Error reading data file. Exiting...")
         exit(1)
 
@@ -97,6 +113,7 @@ if __name__ == '__main__':
         gdf_poly = gpd.read_file(poly_path)
         print("Success.")
     except:
+        logging.exception("Error reading polygon file.")
         print("Error reading polygon file. Exiting...")
         exit(1)
 
@@ -127,6 +144,7 @@ if __name__ == '__main__':
         gdf_data = gpd.GeoDataFrame(df_data, geometry=gpd.points_from_xy(df_data[lon_col], df_data[lat_col]))
         print("Success.")
     except:
+        logging.exception("Couldn't make points from provided lat/lon data")
         print("Couldn't make points from provided lat/lon data")
         print("Exiting...")
         exit(1)
@@ -137,6 +155,7 @@ if __name__ == '__main__':
         gdf_joined = gpd.sjoin(gdf_data, gdf_poly, op='within', how='left')
         print("Success.")
     except:
+        logging.exception("Spatial join failed.")
         print("Spatial join failed.")
         print("Exiting...")
         exit(1)
@@ -155,6 +174,7 @@ if __name__ == '__main__':
         df_joined.to_csv(fname)
         print("Success.")
     except:
+        logging.exception("Could not write result.")
         print("Could not write result.")
         print("Exiting...")
         exit(1)
