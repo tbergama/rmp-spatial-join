@@ -6,14 +6,19 @@ A python utility to join point data with polygon shapefiles.
 
 To use the utility, you will need to set up a couple things first:
 
-1. Clone this repository
+**1. Get your copy of the utility. You have two options for this:**
 
-`git clone https://github.com/tbergama/rmp-spatial-join.git`
+  a. _Clone the repository with git._ This is recommended but does require familiarity with git version control. Using this option will allow to easily keep your copy of the utility up to date with any updates that may come out. Clone the repository with:
+  
+  `git clone https://github.com/tbergama/rmp-spatial-join.git`
+  
+  b. _Download as a ZIP._ If you do not have git setup on your machine, this will be the simpler and faster option. Do this by clicking the green "Clone or Download" button and then "Download ZIP". 
 
-2. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/windows.html) if you haven't already. You can opt for miniconda or the full anaconda install.
+2. **[Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/windows.html) if you haven't already.** You can opt for miniconda or the full anaconda install.
 
-3. Set up conda environment
+3. **Set up conda environment** This can be done with the Anaconda Navigator GUI by importing `environment.yaml`, activating the new environment, and launching the CMC.exe. It can also be done in the Anaconda Prompt with the following (note that you need to change your working directory to the `rmp-spatial-join` directory)
 ```
+cd path\to\rmp-spatial-join
 conda env create -f environment.yaml
 conda activate rmp-spatial-join
 ```
@@ -78,7 +83,7 @@ This should produce a file called `config.py` in the directory. To change the de
 
 ### If You Get Errors
 
-If the utility fails for any reason, you will either see a message print the screen followed by `Exiting...`. 
+If the utility fails for any reason, you will see a message print the to screen followed by `Exiting...`.
 
 If this happens, information about the error will be written to a file called  `assign_polys.log`. 
 
