@@ -14,9 +14,9 @@ To use the utility, you will need to set up a couple things first:
   
   b. _Download as a ZIP._ If you do not have git setup on your machine, this will be the simpler and faster option. Do this by clicking the green "Clone or Download" button and then "Download ZIP". 
 
-2. **[Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/windows.html) if you haven't already.** You can opt for miniconda or the full anaconda install.
+**2. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/windows.html) if you haven't already.** You can opt for miniconda or the full anaconda install.
 
-3. **Set up conda environment** This can be done with the Anaconda Navigator GUI by importing `environment.yaml`, activating the new environment, and launching the CMC.exe. It can also be done in the Anaconda Prompt with the following (note that you need to change your working directory to the `rmp-spatial-join` directory)
+**3. Set up conda environment.** This can be done with the Anaconda Navigator GUI by importing `environment.yaml`, activating the new environment, and launching the CMC.exe. It can also be done in the Anaconda Prompt with the following (note that you need to change your working directory to the `rmp-spatial-join` directory)
 ```
 cd path\to\rmp-spatial-join
 conda env create -f environment.yaml
