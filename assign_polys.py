@@ -171,7 +171,7 @@ if __name__ == '__main__':
     # Write csv
     print("Writing CSV...")
     try:
-        df_joined.to_csv(fname)
+        df_joined.to_csv(fname, index=False)
         print("Success.")
     except:
         logging.exception("Could not write result.")
