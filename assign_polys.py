@@ -130,14 +130,28 @@ if __name__ == '__main__':
 
     # For each data file...
     for f in data_files:
-        # Try to read data from files
+        # Try to read data from file
         try:
             print(f"Reading {f}")
+
+            # Handle Nulls
             if args.nullvals is not None:
                 null_vals = args.nullvals.split(",")
             else:
                 null_vals = None
-            df_data = pd.read_csv(f, na_values=null_vals)
+
+            # Handle filetype
+            extension = f.name.split(".")[1]
+            if extension == "csv":
+                df_data = pd.read_csv(f, na_values=null_vals)
+            if extension == "xlsx":
+                df_data = pd.read_excel(f, na_values=null_vals)
+            else:
+                print("Error reading data file.")
+                print(f"{f} has an unsupported file extension.")
+                print("Exiting...")
+                exit(1)
+
             print("Success.")
         except:
             logging.exception("Error reading data file.")
