@@ -121,12 +121,10 @@ if __name__ == '__main__':
     # If a directory was passed for data path, build list of files in directory
     data_files = []
     if os.path.isdir(data_path):
-        print("this is a directory")
         data_files.extend([Path(os.path.join(data_path, f)) for f in os.listdir(data_path) if
                            os.path.isfile(os.path.join(data_path, f))])
     else:
         data_files = [data_path]
-        print("this is a file")
 
     # For each data file...
     for f in data_files:
