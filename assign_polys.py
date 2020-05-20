@@ -57,6 +57,12 @@ if __name__ == '__main__':
              "(ex: --nullvals \"list,of,vals\")"
     )
 
+    parser.add_argument(
+        "-o", "--output",
+        default=".",
+        help="Directory to output files to"
+    )
+
     args = parser.parse_args()
 
     # ----- Validate Arguments -----
@@ -79,14 +85,6 @@ if __name__ == '__main__':
     else:
         poly_path = Path(args.polygons)
 
-    # Check that files exist
-    data_path = Path(args.data)
-    if not data_path.exists():
-        print(f"Data path does not exist: {data_path}")
-        print("Please provide a valid data path with the -d/--data argument.")
-        print("Exiting...")
-        exit(1)
-
     if not poly_path.exists():
         print(f"Polygons path does not exist: {poly_path}")
         print("Please provide a valid polygons path with the -p/--polygons argument or set default path by running:" \
@@ -94,18 +92,12 @@ if __name__ == '__main__':
         print("Exiting...")
         exit(1)
 
-    # Try to read data from files
-    try:
-        print(f"Reading {data_path}")
-        if args.nullvals is not None:
-            null_vals = args.nullvals.split(",")
-        else:
-            null_vals = None
-        df_data = pd.read_csv(data_path, na_values=null_vals)
-        print("Success.")
-    except:
-        logging.exception("Error reading data file.")
-        print("Error reading data file. Exiting...")
+    # Check that files exist
+    data_path = Path(args.data)
+    if not data_path.exists():
+        print(f"Data path does not exist: {data_path}")
+        print("Please provide a valid data path with the -d/--data argument.")
+        print("Exiting...")
         exit(1)
 
     try:
@@ -117,65 +109,109 @@ if __name__ == '__main__':
         print("Error reading polygon file. Exiting...")
         exit(1)
 
-    # Confirm that provided latitude/longitude column names exist in df_data
     lat_col = args.lat
     lon_col = args.lon
 
-    if lat_col not in df_data.columns.values:
-        print(f"{lat_col} is not a valid column in provided dataset")
-        print("Please verify the correct column name and try again")
-        print("Exiting...")
-        exit(1)
+    output_path = Path(args.output)
 
-    if lon_col not in df_data.columns.values:
-        print(f"{lon_col} is not a valid column in provided dataset")
-        print("Please verify the correct column name and try again")
-        print("Exiting...")
-        exit(1)
+    # Create output directory if it doesn't exist
+    if not output_path.exists():
+        os.mkdir(output_path)
 
-    # ----- Perform Spatial Join ------
+    # If a directory was passed for data path, build list of files in directory
+    data_files = []
+    if os.path.isdir(data_path):
+        data_files.extend([Path(os.path.join(data_path, f)) for f in os.listdir(data_path) if
+                           os.path.isfile(os.path.join(data_path, f))])
+    else:
+        data_files = [data_path]
 
-    # Convert dataframe to geodataframe
-    print("Creating points from data lat/lon columns...")
+    # For each data file...
+    for f in data_files:
+        # Try to read data from file
+        try:
+            print(f"Reading {f}")
 
-    try:
-        df_data.astype({lat_col: 'float64',
-                        lon_col: 'float64'})
-        gdf_data = gpd.GeoDataFrame(df_data, geometry=gpd.points_from_xy(df_data[lon_col], df_data[lat_col]))
-        print("Success.")
-    except:
-        logging.exception("Couldn't make points from provided lat/lon data")
-        print("Couldn't make points from provided lat/lon data")
-        print("Exiting...")
-        exit(1)
+            # Handle Nulls
+            if args.nullvals is not None:
+                null_vals = args.nullvals.split(",")
+            else:
+                null_vals = None
 
-    # Perform spatial join
-    print("Performing spatial join...")
-    try:
-        gdf_joined = gpd.sjoin(gdf_data, gdf_poly, op='within', how='left')
-        print("Success.")
-    except:
-        logging.exception("Spatial join failed.")
-        print("Spatial join failed.")
-        print("Exiting...")
-        exit(1)
+            # Handle filetype
+            extension = f.name.split(".")[1]
+            if extension == "csv":
+                df_data = pd.read_csv(f, na_values=null_vals)
+            if extension == "xlsx":
+                df_data = pd.read_excel(f, na_values=null_vals)
+            else:
+                print("Error reading data file.")
+                print(f"{f} has an unsupported file extension.")
+                print("Exiting...")
+                exit(1)
 
-    # ----- Write result to CSV -----
+            print("Success.")
+        except:
+            logging.exception("Error reading data file.")
+            print("Error reading data file. Exiting...")
+            exit(1)
 
-    # Convert joined geodataframe to pandas dataframe
-    df_joined = pd.DataFrame(gdf_joined.drop(columns="geometry"))
+        # Confirm that provided latitude/longitude column names exist in df_data
+        if lat_col not in df_data.columns.values:
+            print(f"{lat_col} is not a valid column in provided dataset")
+            print("Please verify the correct column name and try again")
+            print("Exiting...")
+            exit(1)
 
-    # Append "SpatialJoin" to the data file name
-    fname = data_path.name.split(".")[0]+"SpatialJoin.csv"
+        if lon_col not in df_data.columns.values:
+            print(f"{lon_col} is not a valid column in provided dataset")
+            print("Please verify the correct column name and try again")
+            print("Exiting...")
+            exit(1)
 
-    # Write csv
-    print("Writing CSV...")
-    try:
-        df_joined.to_csv(fname, index=False)
-        print("Success.")
-    except:
-        logging.exception("Could not write result.")
-        print("Could not write result.")
-        print("Exiting...")
-        exit(1)
+        # ----- Perform Spatial Join ------
+
+        # Convert dataframe to geodataframe
+        print("Creating points from data lat/lon columns...")
+
+        try:
+            df_data.astype({lat_col: 'float64',
+                            lon_col: 'float64'})
+            gdf_data = gpd.GeoDataFrame(df_data, geometry=gpd.points_from_xy(df_data[lon_col], df_data[lat_col]))
+            print("Success.")
+        except:
+            logging.exception("Couldn't make points from provided lat/lon data")
+            print("Couldn't make points from provided lat/lon data")
+            print("Exiting...")
+            exit(1)
+
+        # Perform spatial join
+        print("Performing spatial join...")
+        try:
+            gdf_joined = gpd.sjoin(gdf_data, gdf_poly, op='within', how='left')
+            print("Success.")
+        except:
+            logging.exception("Spatial join failed.")
+            print("Spatial join failed.")
+            print("Exiting...")
+            exit(1)
+
+        # ----- Write result to CSV -----
+
+        # Convert joined geodataframe to pandas dataframe
+        df_joined = pd.DataFrame(gdf_joined.drop(columns="geometry"))
+
+        # Append "_spatialJoin" to the data file name
+        fname = f.name.split(".")[0]+"_spatialJoin.csv"
+
+        # Write csv
+        print("Writing CSV...")
+        try:
+            df_joined.to_csv(Path(output_path, fname), index=False)
+            print("Success.")
+        except:
+            logging.exception("Could not write result.")
+            print("Could not write result.")
+            print("Exiting...")
+            exit(1)
 
