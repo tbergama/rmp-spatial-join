@@ -175,6 +175,7 @@ if __name__ == '__main__':
         print("Creating points from data lat/lon columns...")
 
         try:
+        	df_data.dropna(axis="rows", how="any", subset=[lat_col, lon_col], inplace=True)
             df_data.astype({lat_col: 'float64',
                             lon_col: 'float64'})
             gdf_data = gpd.GeoDataFrame(df_data, geometry=gpd.points_from_xy(df_data[lon_col], df_data[lat_col]))
