@@ -208,7 +208,7 @@ if __name__ == '__main__':
         # Write csv
         print("Writing CSV...")
         try:
-            df_joined.to_csv(Path(output_path, fname), index=False)
+            df_joined.to_csv(Path(output_path, fname), index=False, encoding = "utf-8-sig")
             print("Success.")
         except:
             logging.exception("Could not write result.")
