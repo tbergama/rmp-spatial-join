@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 
+import pandas as pd
+import numpy as np
+from pathlib import Path
+import os 
+import string
 import argparse
 from pathlib import Path
-import os
-import pandas as pd
-import geopandas as gpd
 import warnings
 import logging
+os.getcwd()
 
 if __name__ == '__main__':
 
     # ----- Set Up Logging ------
 
-    logfile = "assign_polys.log"
+    logfile = "assign_stats.log"
 
     # Delete any old logfile
     if os.path.exists(logfile):
@@ -33,21 +36,9 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        "-p", "--polygons",
+        "-p", "--parameters",
         default=None,
-        help="File path to polygon .shp"
-    )
-
-    parser.add_argument(
-        "--lat",
-        default="latitude",
-        help="Name of latitude column in data csv (default is \"latitude\")"
-    )
-
-    parser.add_argument(
-        "--lon",
-        default="longitude",
-        help="Name of longitude column in data csv (default is \"longitude\")"
+        help="File path to constituents .txt"
     )
 
     parser.add_argument(
@@ -71,24 +62,24 @@ if __name__ == '__main__':
     warnings.filterwarnings("ignore")
 
     # Handle default polygon path
-    if args.polygons is None:
+    if args.stats is None:
         try:
-            from config import poly_path
-            poly_path = Path(poly_path)
+            from config import parameters_path
+            parameters_path = Path(parameters_path)
         except:
-            logging.exception("Polygon path was not provided and no default was found.")
-            print("Polygon path was not provided and no default was found.")
-            print("Provide a polygon path with -p/--polygons or set default path by running: " \
-                  "echo poly_path=\"path/to/polys.shp\" > config.py")
+            logging.exception("Parameters path was not provided and no default was found.")
+            print("Parameters path was not provided and no default was found.")
+            print("Provide a data path with -p/--parameters or set default path by running: " \
+                  "echo parameters_path=\"path/to/parameters.txt\" > config.py")
             print("Exiting...")
             exit(1)
     else:
-        poly_path = Path(args.polygons)
+        parameters_path = Path(args.stats)
 
-    if not poly_path.exists():
-        print(f"Polygons path does not exist: {poly_path}")
-        print("Please provide a valid polygons path with the -p/--polygons argument or set default path by running:" \
-              "echo poly_path=\"path/to/polys.shp\" > config.py")
+    if not parameters_path.exists():
+        print(f"Parameters path does not exist: {parameters_path}")
+        print("Please provide a valid parameters path with the -p/--parameters argument or set default path by running:" \
+              "echo parameters_path=\"path/to/parameters.txt\" > config.py")
         print("Exiting...")
         exit(1)
 
@@ -144,6 +135,11 @@ if __name__ == '__main__':
                 df_data = pd.read_csv(f, na_values=null_vals)
             if extension == "xlsx":
                 df_data = pd.read_excel(f, na_values=null_vals)
+            else:
+                print("Error reading data file.")
+                print(f"{f} has an unsupported file extension.")
+                print("Exiting...")
+                exit(1)
 
             print("Success.")
         except:
@@ -170,7 +166,6 @@ if __name__ == '__main__':
         print("Creating points from data lat/lon columns...")
 
         try:
-            df_data.dropna(axis="rows", how="any", subset=[lat_col, lon_col], inplace=True)
             df_data.astype({lat_col: 'float64',
                             lon_col: 'float64'})
             gdf_data = gpd.GeoDataFrame(df_data, geometry=gpd.points_from_xy(df_data[lon_col], df_data[lat_col]))
@@ -203,7 +198,7 @@ if __name__ == '__main__':
         # Write csv
         print("Writing CSV...")
         try:
-            df_joined.to_csv(Path(output_path, fname), index=False, encoding = "utf-8-sig")
+            df_joined.to_csv(Path(output_path, fname), index=False)
             print("Success.")
         except:
             logging.exception("Could not write result.")
