@@ -144,11 +144,6 @@ if __name__ == '__main__':
                 df_data = pd.read_csv(f, na_values=null_vals)
             if extension == "xlsx":
                 df_data = pd.read_excel(f, na_values=null_vals)
-            else:
-                print("Error reading data file.")
-                print(f"{f} has an unsupported file extension.")
-                print("Exiting...")
-                exit(1)
 
             print("Success.")
         except:
